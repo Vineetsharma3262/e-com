@@ -1,26 +1,96 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #faf7f2;
+  --bg-alt: #f2ece3;
+  --card: #ffffff;
+  --line: #e7dfd3;
+  --ink: #1b1714;
+  --muted: #6f665c;
+  --accent: #c4521c;
+  --accent-hover: #a94416;
+  --saffron: #e9a21f;
+  --night: #111111;
+}
+
+.dark {
+  --bg: #13110f;
+  --bg-alt: #1b1815;
+  --card: #201c19;
+  --line: #352e28;
+  --ink: #f3ece3;
+  --muted: #b2a799;
+  --accent: #e2672c;
+  --accent-hover: #ee7a42;
+  --saffron: #f2b544;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-bg-alt: var(--bg-alt);
+  --color-card: var(--card);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-saffron: var(--saffron);
+  --color-night: var(--night);
+  --font-sans: var(--font-dm);
+  --font-serif: var(--font-fraunces);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 8rem;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-dm), "DM Sans", sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  letter-spacing: -0.025em;
+}
+
+.font-serif {
+  font-family: var(--font-fraunces), Fraunces, serif;
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 18s linear infinite;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track,
+.animate-marquee {
+  animation: marquee 40s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  .animate-marquee {
+    animation: none;
+  }
 }
