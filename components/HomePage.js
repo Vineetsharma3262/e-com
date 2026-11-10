@@ -15,7 +15,7 @@ const ticker = [
   "EASY 7-DAY RETURNS",
   "CASH ON DELIVERY",
   "पूरे भारत में डिलीवरी",
-  "TEES · DENIM · SNEAKERS · LEATHER",
+  "TEES · SHIRTS · SUITS",
 ];
 
 export function HomePage() {
@@ -72,7 +72,7 @@ export function HomePage() {
                     <path id="badge-circle" d="M60 60m-44 0a44 44 0 1 1 88 0a44 44 0 1 1-88 0" />
                   </defs>
                   <text fill="#f2b544" fontSize="10.5" fontWeight="700" letterSpacing="2.6">
-                    <textPath href="#badge-circle">NEW SEASON · YOUR BRAND HERE ·</textPath>
+                    <textPath href="#badge-circle">NEW SEASON · AURELLE ·</textPath>
                   </text>
                 </svg>
                 <svg viewBox="0 0 24 24" className="h-8 w-8 text-[#e2672c]" fill="currentColor" aria-hidden>
@@ -118,7 +118,7 @@ export function HomePage() {
           <p className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-accent">{t("shopBy")}</p>
           <h2 className="font-serif text-4xl font-semibold leading-tight sm:text-5xl">{t("findFit")}</h2>
         </div>
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="mx-auto grid max-w-4xl gap-4 sm:grid-cols-2">
           {collections.map((collection) => {
             const stats = collectionStats(collection.slug);
             const title = t(collection.slug === "men" ? "mensClothing" : collection.slug === "women" ? "womensClothing" : collection.slug);
@@ -205,8 +205,6 @@ export function HomePage() {
       <section id="shop" className="relative py-20">
         <span id="men" className="absolute top-0" aria-hidden />
         <span id="women" className="absolute top-0" aria-hidden />
-        <span id="footwear" className="absolute top-0" aria-hidden />
-        <span id="bags" className="absolute top-0" aria-hidden />
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <ShopGrid />
         </div>
@@ -227,8 +225,8 @@ export function HomePage() {
                 {t("shopEdit")}
                 <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link href="/collections/footwear" className="inline-flex items-center rounded-full border border-white/30 px-6 py-3 font-semibold transition hover:bg-white hover:text-night">
-                {t("shoesBags")}
+              <Link href="/collections/men" className="inline-flex items-center rounded-full border border-white/30 px-6 py-3 font-semibold transition hover:bg-white hover:text-night">
+                {t("shopMen")}
               </Link>
             </div>
           </div>

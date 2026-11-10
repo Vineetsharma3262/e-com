@@ -5,6 +5,7 @@ import { ChevronRight } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { useShop } from "@/components/ShopProvider";
+import { useInfiniteSlice } from "@/components/useInfiniteSlice";
 import { sortProducts } from "@/lib/catalog";
 import { formatINR } from "@/lib/site";
 
@@ -12,14 +13,13 @@ const filters = [
   { slug: "all", key: "allProductsFilter", href: "/collections/all" },
   { slug: "men", key: "mensClothing", href: "/collections/men" },
   { slug: "women", key: "womensClothing", href: "/collections/women" },
-  { slug: "footwear", key: "footwear", href: "/collections/footwear" },
-  { slug: "bags", key: "bags", href: "/collections/bags" },
 ];
 
 export function CollectionView({ collection, products, count, from }) {
   const { t } = useShop();
   const [sort, setSort] = useState("featured");
   const visible = useMemo(() => sortProducts(products, sort), [products, sort]);
+  const { shown, sentinel, hasMore } = useInfiniteSlice(visible.length, 16, `${collection.slug}:${sort}`);
   const title = t(filters.find((item) => item.slug === collection.slug)?.key || "allProducts");
 
   return (
@@ -86,10 +86,14 @@ export function CollectionView({ collection, products, count, from }) {
           </label>
         </div>
         <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
-          {visible.map((product) => (
+          {visible.slice(0, shown).map((product) => (
             <ProductCard key={product.slug} product={product} />
           ))}
         </div>
+        <p className="mt-8 text-center text-sm font-medium text-muted" aria-live="polite">
+          {t("shownOf").replace("{shown}", String(shown)).replace("{total}", String(visible.length))}
+        </p>
+        {hasMore && <div ref={sentinel} className="h-8" aria-hidden />}
       </div>
     </>
   );

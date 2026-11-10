@@ -24,7 +24,7 @@ export function SearchDialog() {
         product.name.toLowerCase().includes(q) ||
         collection?.title.toLowerCase().includes(q)
       );
-    });
+    }).slice(0, 20);
   }, [query]);
 
   if (!searchOpen) return null;

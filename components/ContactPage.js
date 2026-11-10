@@ -34,7 +34,7 @@ export function ContactPage() {
       title: t("whatsapp"),
       lines: [t("whatsappBlurb")],
       action: t("startChat"),
-      href: whatsappLink("Hi Your Brand, I have a question."),
+      href: whatsappLink(`Hi ${site.name}, I have a question.`),
       external: true,
       icon: <WhatsAppIcon />,
     },

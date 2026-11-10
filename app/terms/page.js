@@ -37,12 +37,12 @@ export default function TermsPage() {
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-12 lg:px-8">
     <article className="mx-auto max-w-3xl">
-      <p className="mb-2 text-sm font-bold uppercase tracking-[0.2em] text-accent">Your Brand</p>
+      <p className="mb-2 text-sm font-bold uppercase tracking-[0.2em] text-accent">Aurelle</p>
       <h1 className="font-serif text-4xl font-semibold leading-tight sm:text-5xl">Terms & Conditions</h1>
       <p className="mt-3 text-sm text-muted">Last updated: 3 November 2026</p>
       <div className={`mt-6 text-[17px] ${prose}`}>
         <p>
-          These terms apply when you browse this website or buy from Your Brand (“we”, “us”). Please read them before placing an order. By using the website you agree to these terms and to our <Link href="/privacy">Privacy Policy</Link>.
+          These terms apply when you browse this website or buy from Aurelle (“we”, “us”). Please read them before placing an order. By using the website you agree to these terms and to our <Link href="/privacy">Privacy Policy</Link>.
         </p>
       </div>
       <nav aria-label="Contents" className="mt-8 rounded-2xl border border-line bg-card p-5">
@@ -92,7 +92,7 @@ export default function TermsPage() {
         <p>Please do not misuse the website: no attempts to access other people&apos;s data, interfere with the website&apos;s operation, place fraudulent orders or copy content for commercial use.</p>
       </Block>
       <Block id="ip" title="9. Content and trademarks">
-        <p>The Your Brand name, logo, text, images and design of this website belong to us or our licensors. You may not use them without our written permission.</p>
+        <p>The Aurelle name, logo, text, images and design of this website belong to us or our licensors. You may not use them without our written permission.</p>
       </Block>
       <Block id="liability" title="10. Our responsibility to you">
         <p>We are responsible for supplying the products you order as described. To the extent the law allows, we are not liable for indirect losses or for delays caused by events outside our reasonable control. Our total liability for any order is limited to the amount you paid for it. Nothing in these terms limits your rights under the Consumer Protection Act, 2019.</p>
@@ -106,7 +106,7 @@ export default function TermsPage() {
       <Block id="contact" title="13. Grievance officer and contact">
         <p>For complaints about an order, a product or this website, contact our grievance officer. We acknowledge complaints within 48 hours and aim to resolve them within one month.</p>
         <address className="rounded-2xl border border-line bg-card p-5 not-italic">
-          <b>Grievance Officer</b>, Customer Care, Your Brand
+          <b>Grievance Officer</b>, Customer Care, Aurelle
           <br />
           {site.addressOneLine}
           <br />

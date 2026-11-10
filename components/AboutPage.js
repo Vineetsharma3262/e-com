@@ -16,7 +16,7 @@ export function AboutPage() {
   const split = title.split("you");
   const stats = [
     [t("stat30"), t("stat30l")],
-    ["4", t("collections")],
+    ["2", t("collections")],
     [t("statPrice"), t("statPricel")],
     [t("statIndia"), t("statIndial")],
   ];

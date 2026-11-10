@@ -1,22 +1,20 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Minus, Plus, X } from "lucide-react";
 import { useShop } from "@/components/ShopProvider";
-import { formatINR, whatsappLink } from "@/lib/site";
+import { saveCheckout } from "@/lib/checkout";
+import { formatINR } from "@/lib/site";
 
 export function CartDrawer() {
+  const router = useRouter();
   const { t, cart, subtotal, shipping, total, cartOpen, setCartOpen, changeQty, removeItem } = useShop();
 
-  function placeOrder() {
-    const lines = cart
-      .map(
-        (item) =>
-          `• ${item.product.name} (${item.size}) × ${item.qty} — ${formatINR(item.lineTotal)}`,
-      )
-      .join("\n");
-    const message = `Hi Your Brand, I'd like to place an order:\n${lines}\n\nSubtotal: ${formatINR(subtotal)}\nShipping: ${shipping === 0 ? "Free" : formatINR(shipping)}\nTotal: ${formatINR(total)}\n\nPlease confirm availability, delivery and payment.`;
-    window.open(whatsappLink(message), "_blank", "noopener,noreferrer");
+  function checkout() {
+    saveCheckout({ source: "cart" });
+    setCartOpen(false);
+    router.push("/checkout");
   }
 
   return (
@@ -107,10 +105,10 @@ export function CartDrawer() {
           <button
             type="button"
             disabled={cart.length === 0}
-            onClick={placeOrder}
+            onClick={checkout}
             className="w-full rounded-full bg-ink py-3 font-semibold text-bg transition hover:bg-accent hover:text-white disabled:opacity-40"
           >
-            {t("placeOrder")}
+            {t("checkout")}
           </button>
           <p className="mt-3 text-center text-xs text-muted">{t("cartNote")}</p>
         </div>

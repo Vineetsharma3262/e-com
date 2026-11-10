@@ -3,15 +3,15 @@
 import Link from "next/link";
 import { useState } from "react";
 import { ArrowRight, Mail, MapPin, Phone } from "lucide-react";
+import { Logo } from "@/components/Logo";
 import { useShop } from "@/components/ShopProvider";
 import { site } from "@/lib/site";
 
 const shopLinks = [
   ["/collections/men", "mensClothing"],
   ["/collections/women", "womensClothing"],
-  ["/collections/footwear", "footwear"],
-  ["/collections/bags", "bags"],
   ["/collections/all", "allProducts"],
+  ["/account", "profile"],
 ];
 
 const helpLinks = [
@@ -32,14 +32,7 @@ export function Footer() {
     <footer className="mt-10 bg-night text-[#e9e1d6]">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1.3fr] lg:px-8">
         <div>
-          <span className="inline-block rounded-xl bg-white px-4 py-3">
-            <span className="flex items-center gap-2">
-              <span className="grid h-8 w-8 place-items-center rounded-md border-2 border-dashed border-[#c4521c]/60 text-[9px] font-bold tracking-wider text-[#c4521c]">
-                LOGO
-              </span>
-              <span className="font-serif text-xl font-semibold leading-none tracking-tight text-[#1b1714]">Your Brand</span>
-            </span>
-          </span>
+          <Logo tone="light" />
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-[#e9e1d6]/75">{t("footerBlurb")}</p>
           <div className="mt-5 flex gap-3">
             <a href={site.instagram} aria-label="Instagram" className="grid h-11 w-11 place-items-center rounded-full border border-white/20 hover:border-[#e2672c] hover:text-[#e2672c]">

@@ -25,6 +25,8 @@ export function ShopProvider({ children }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [toast, setToast] = useState("");
+  const [addresses, setAddresses] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -37,6 +39,18 @@ export function ShopProvider({ children }) {
     } catch {
       setCart([]);
     }
+    try {
+      const storedAddresses = JSON.parse(localStorage.getItem("addresses") || "[]");
+      if (Array.isArray(storedAddresses)) setAddresses(storedAddresses);
+    } catch {
+      setAddresses([]);
+    }
+    try {
+      const storedOrders = JSON.parse(localStorage.getItem("orders") || "[]");
+      if (Array.isArray(storedOrders)) setOrders(storedOrders);
+    } catch {
+      setOrders([]);
+    }
     setReady(true);
   }, []);
 
@@ -44,6 +58,16 @@ export function ShopProvider({ children }) {
     if (!ready) return;
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart, ready]);
+
+  useEffect(() => {
+    if (!ready) return;
+    localStorage.setItem("addresses", JSON.stringify(addresses));
+  }, [addresses, ready]);
+
+  useEffect(() => {
+    if (!ready) return;
+    localStorage.setItem("orders", JSON.stringify(orders));
+  }, [orders, ready]);
 
   useEffect(() => {
     document.documentElement.lang = lang === "hi" ? "hi" : "en";
@@ -113,6 +137,61 @@ export function ShopProvider({ children }) {
     setCart((current) => current.filter((item) => item.id !== id));
   }
 
+  function clearCart() {
+    setCart([]);
+  }
+
+  function saveAddress(input) {
+    setAddresses((current) => {
+      const id = input.id || crypto.randomUUID();
+      const record = { ...input, id };
+      const next = input.id
+        ? current.map((item) => (item.id === id ? record : item))
+        : [...current, record];
+      const makeDefault = input.isDefault || !next.some((item) => item.isDefault && item.id !== id);
+      if (makeDefault) return next.map((item) => ({ ...item, isDefault: item.id === id }));
+      return next.map((item) => (item.id === id ? { ...item, isDefault: false } : item));
+    });
+  }
+
+  function removeAddress(id) {
+    setAddresses((current) => {
+      const next = current.filter((item) => item.id !== id);
+      if (next.length && !next.some((item) => item.isDefault)) {
+        next[0] = { ...next[0], isDefault: true };
+      }
+      return next;
+    });
+  }
+
+  function setDefaultAddress(id) {
+    setAddresses((current) => current.map((item) => ({ ...item, isDefault: item.id === id })));
+  }
+
+  function placeOrder({ lines, address, payment }) {
+    const orderSubtotal = lines.reduce((sum, line) => sum + line.product.price * line.qty, 0);
+    const orderShipping = orderSubtotal === 0 || orderSubtotal >= site.freeShippingOver ? 0 : site.shippingFee;
+    const order = {
+      id: `AUR${Date.now().toString().slice(-8)}`,
+      items: lines.map((line) => ({
+        slug: line.product.slug,
+        name: line.product.name,
+        image: line.product.image,
+        size: line.size,
+        qty: line.qty,
+        price: line.product.price,
+      })),
+      address: { ...address },
+      payment,
+      subtotal: orderSubtotal,
+      shipping: orderShipping,
+      total: orderSubtotal + orderShipping,
+      createdAt: new Date().toISOString(),
+    };
+    setOrders((current) => [order, ...current]);
+    return order;
+  }
+
   const lines = cart
     .map((item) => {
       const product = getProduct(item.slug);
@@ -147,6 +226,14 @@ export function ShopProvider({ children }) {
     addItem,
     changeQty,
     removeItem,
+    clearCart,
+    ready,
+    addresses,
+    orders,
+    saveAddress,
+    removeAddress,
+    setDefaultAddress,
+    placeOrder,
     toast,
   };
 

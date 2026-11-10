@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { BadgeCheck, ChevronRight, CreditCard, Phone, Plus, RotateCcw, ShoppingBag, Truck } from "lucide-react";
+import { BadgeCheck, ChevronRight, CreditCard, Plus, RotateCcw, ShoppingBag, Truck } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
 import { useShop } from "@/components/ShopProvider";
-import { formatINR, site } from "@/lib/site";
+import { saveCheckout } from "@/lib/checkout";
+import { formatINR } from "@/lib/site";
 
 const trust = [
   [Truck, "trust1"],
@@ -16,18 +18,18 @@ const trust = [
 
 export function ProductView({ product, related }) {
   const { t, addItem, setCartOpen } = useShop();
+  const router = useRouter();
+  const gallery = [...new Set(product.images?.length ? product.images : [product.image])];
+  const [photo, setPhoto] = useState(gallery[0]);
   const [size, setSize] = useState(product.sizes[0]);
   const detailsRef = useRef(null);
   useEffect(() => {
+    setPhoto(product.images?.[0] || product.image);
+    setSize(product.sizes[0]);
     if (detailsRef.current) detailsRef.current.open = true;
-  }, [product.slug]);
+  }, [product]);
   const single = product.sizes.length === 1;
-  const categoryKey = {
-    men: "mensClothing",
-    women: "womensClothing",
-    footwear: "footwear",
-    bags: "bags",
-  }[product.category];
+  const categoryKey = product.category === "women" ? "womensClothing" : "mensClothing";
   const categoryTitle = t(categoryKey);
   const panels = [
     { id: "details", label: t("details"), items: product.details },
@@ -57,12 +59,32 @@ export function ProductView({ product, related }) {
         <div className="mt-6 grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
           <div className="lg:sticky lg:top-36 lg:self-start">
             <div className="relative aspect-[4/5] overflow-hidden rounded-3xl bg-bg-alt">
-              <img src={product.image} alt={product.name} className="absolute inset-0 h-full w-full object-cover" />
+              <img src={photo} alt={product.name} className="absolute inset-0 h-full w-full object-cover" />
             </div>
+            {gallery.length > 1 && (
+              <div className="mt-3 flex gap-2">
+                {gallery.map((src, index) => (
+                  <button
+                    key={src}
+                    type="button"
+                    aria-label={`${t("photo")} ${index + 1}`}
+                    onClick={() => setPhoto(src)}
+                    className={`h-20 w-16 overflow-hidden rounded-xl border ${photo === src ? "border-ink" : "border-line"}`}
+                  >
+                    <img src={src} alt="" className="h-full w-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.18em] text-accent">{categoryTitle}</p>
             <h1 className="mt-2 font-serif text-4xl font-semibold leading-tight sm:text-5xl">{product.name}</h1>
+            {product.pieces > 0 && (
+              <p className="mt-3 inline-flex rounded-full bg-accent/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-accent">
+                {product.pieces === 3 ? t("piece3") : t("piece2")}
+              </p>
+            )}
             <p className="mt-5 flex flex-wrap items-baseline gap-2">
               <span className="font-serif text-3xl font-semibold">{formatINR(product.price)}</span>
               <span className="text-sm text-muted">{t("inclTax")}</span>
@@ -95,34 +117,28 @@ export function ProductView({ product, related }) {
                   ))}
                 </div>
               )}
-              <button
-                type="button"
-                onClick={() => {
-                  addItem(product.slug, size, 1);
-                  setCartOpen(true);
-                }}
-                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 font-semibold text-white transition hover:bg-accent-hover"
-              >
-                <ShoppingBag className="h-5 w-5" />
-                {t("addToCart")}
-              </button>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                <Link
-                  href="/contact"
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    addItem(product.slug, size, 1);
+                    setCartOpen(true);
+                  }}
                   className="inline-flex items-center justify-center gap-2 rounded-full border border-ink/25 px-6 py-3.5 font-semibold transition hover:border-ink hover:bg-ink hover:text-bg"
                 >
-                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden>
-                    <path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3a.5.5 0 0 0 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.5-.3z" />
-                  </svg>
-                  {t("enquire")}
-                </Link>
-                <a
-                  href={`tel:${site.phoneTel}`}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-ink/25 px-6 py-3.5 font-semibold transition hover:border-ink hover:bg-ink hover:text-bg"
+                  <ShoppingBag className="h-5 w-5" />
+                  {t("addToCart")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    saveCheckout({ source: "buy", lines: [{ slug: product.slug, size, qty: 1 }] });
+                    router.push("/checkout");
+                  }}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 font-semibold text-white transition hover:bg-accent-hover"
                 >
-                  <Phone className="h-4 w-4" />
-                  {t("callOrder")}
-                </a>
+                  {t("buyNow")}
+                </button>
               </div>
             </div>
             <ul className="mt-8 grid grid-cols-2 gap-2.5">

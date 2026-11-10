@@ -16,11 +16,11 @@ const fraunces = Fraunces({
 
 export const metadata = {
   title: {
-    default: "Your Brand — Men's & Women's Clothing, Footwear and Leather Bags",
-    template: "%s — Your Brand",
+    default: "Aurelle — Men's & Women's Clothing",
+    template: "%s — Aurelle",
   },
   description:
-    "Everyday tees and kurtis, shirts and denim, sneakers, sandals, leather bags and accessories, hand-picked by Your Brand and delivered across India.",
+    "T-shirts, shirts, two-piece and three-piece suits for men and women, from ₹200 to ₹9,500, delivered across India.",
 };
 
 const themeScript = `try{if(localStorage.getItem("theme")==="dark")document.documentElement.classList.add("dark")}catch(e){}`;

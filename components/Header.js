@@ -10,15 +10,15 @@ import {
   Moon,
   Search,
   Sun,
+  UserRound,
   X,
 } from "lucide-react";
+import { Logo } from "@/components/Logo";
 import { useShop } from "@/components/ShopProvider";
 
 const links = [
   { href: "/collections/men", key: "men" },
   { href: "/collections/women", key: "women" },
-  { href: "/collections/footwear", key: "footwear" },
-  { href: "/collections/bags", key: "bags" },
   { href: "/contact", key: "contact" },
 ];
 
@@ -44,13 +44,8 @@ export function Header() {
       <div className="border-b border-line bg-bg/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 lg:px-8">
           <div className="flex items-center gap-6">
-            <Link href="/" aria-label="Your Brand home" className="flex items-center rounded-lg bg-white px-2 py-1.5 shadow-sm">
-              <span className="grid h-8 w-8 place-items-center rounded-md border-2 border-dashed border-[#c4521c]/60 text-[9px] font-bold tracking-wider text-[#c4521c]">
-                LOGO
-              </span>
-              <span className="ml-2 font-serif text-xl font-semibold leading-none tracking-tight text-[#1b1714]">
-                Your Brand
-              </span>
+            <Link href="/" aria-label="Aurelle home" className="flex items-center">
+              <Logo />
             </Link>
             <nav className="hidden items-center gap-1 lg:flex">
               {links.map((link) => (
@@ -127,6 +122,9 @@ export function Header() {
             >
               <Search className="h-5 w-5" />
             </button>
+            <Link href="/account" aria-label={t("profile")} className="rounded-full p-2 hover:bg-card">
+              <UserRound className="h-5 w-5" />
+            </Link>
             <button
               type="button"
               onClick={() => {
@@ -180,6 +178,9 @@ export function Header() {
                 {t(link.key)}
               </Link>
             ))}
+            <Link href="/account" onClick={closeMenu} className="block border-b border-line px-4 py-3.5 text-[15px] font-semibold">
+              {t("profile")}
+            </Link>
             <div className="flex gap-2 px-4 py-3 xl:hidden">
               <button
                 type="button"

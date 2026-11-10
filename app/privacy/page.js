@@ -34,12 +34,12 @@ export default function PrivacyPage() {
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-12 lg:px-8">
     <article className="mx-auto max-w-3xl">
-      <p className="mb-2 text-sm font-bold uppercase tracking-[0.2em] text-accent">Your Brand</p>
+      <p className="mb-2 text-sm font-bold uppercase tracking-[0.2em] text-accent">Aurelle</p>
       <h1 className="font-serif text-4xl font-semibold leading-tight sm:text-5xl">Privacy Policy</h1>
       <p className="mt-3 text-sm text-muted">Last updated: 3 November 2026</p>
       <div className={`mt-6 text-[17px] ${prose}`}>
       <p>
-        This policy explains what personal data Your Brand (“we”, “us”) collects when you use this website, why we collect it, who we share it with and the choices you have. It is written in line with the Digital Personal Data Protection Act, 2023 and the Information Technology Act, 2000.         By using this website or placing an order, you agree to this policy.
+        This policy explains what personal data Aurelle (“we”, “us”) collects when you use this website, why we collect it, who we share it with and the choices you have. It is written in line with the Digital Personal Data Protection Act, 2023 and the Information Technology Act, 2000.         By using this website or placing an order, you agree to this policy.
       </p>
       </div>
       <nav aria-label="Contents" className="mt-8 rounded-2xl border border-line bg-card p-5">
@@ -113,7 +113,7 @@ export default function PrivacyPage() {
       <Block id="contact" title="10. Grievance officer and contact">
         <p>For any privacy question, request or complaint, contact our grievance officer. We acknowledge complaints within 48 hours and aim to resolve them within one month.</p>
         <address className="rounded-2xl border border-line bg-card p-5 not-italic">
-          <b>Grievance Officer</b>, Customer Care, Your Brand
+          <b>Grievance Officer</b>, Customer Care, Aurelle
           <br />
           {site.addressOneLine}
           <br />
