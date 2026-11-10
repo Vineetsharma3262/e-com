@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { usePathname } from "next/navigation";
 import {
   ArrowRight,
@@ -22,10 +22,45 @@ const links = [
   { href: "/contact", key: "contact" },
 ];
 
+function DesktopNav({ t }) {
+  const pathname = usePathname();
+
+  return (
+    <nav className="hidden items-center gap-1 lg:flex">
+      {links.map((link) => (
+        <Link
+          key={link.href}
+          href={link.href}
+          className={`rounded-full px-3.5 py-2 text-[15px] font-semibold transition hover:bg-card hover:text-accent ${
+            pathname === link.href ? "text-accent" : ""
+          }`}
+        >
+          {t(link.key)}
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
+function DesktopNavFallback({ t }) {
+  return (
+    <nav className="hidden items-center gap-1 lg:flex">
+      {links.map((link) => (
+        <Link
+          key={link.href}
+          href={link.href}
+          className="rounded-full px-3.5 py-2 text-[15px] font-semibold transition hover:bg-card hover:text-accent"
+        >
+          {t(link.key)}
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
 export function Header() {
   const { t, lang, setLang, toggleTheme, count, setCartOpen, setSearchOpen, menuOpen, setMenuOpen } =
     useShop();
-  const pathname = usePathname();
   const [langOpen, setLangOpen] = useState(false);
 
   function closeMenu() {
@@ -47,19 +82,9 @@ export function Header() {
             <Link href="/" aria-label="Aurelle home" className="flex items-center">
               <Logo />
             </Link>
-            <nav className="hidden items-center gap-1 lg:flex">
-              {links.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`rounded-full px-3.5 py-2 text-[15px] font-semibold transition hover:bg-card hover:text-accent ${
-                    pathname === link.href ? "text-accent" : ""
-                  }`}
-                >
-                  {t(link.key)}
-                </Link>
-              ))}
-            </nav>
+            <Suspense fallback={<DesktopNavFallback t={t} />}>
+              <DesktopNav t={t} />
+            </Suspense>
           </div>
           <div className="flex items-center gap-1 sm:gap-2">
             <div className="relative">
