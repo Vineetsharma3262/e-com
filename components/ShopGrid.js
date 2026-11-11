@@ -17,11 +17,11 @@ export function ShopGrid() {
   const [tab, setTab] = useState("all");
   const [sort, setSort] = useState("featured");
 
-  const visible = useMemo(() => {
+  const ordered = useMemo(() => {
     const filtered = tab === "all" ? products : products.filter((product) => product.category === tab);
-    return sortProducts(filtered, sort);
+    return sort === "featured" ? filtered : sortProducts(filtered, sort);
   }, [tab, sort]);
-  const { shown, sentinel, hasMore } = useInfiniteSlice(visible.length, 12, `${tab}:${sort}`);
+  const { shown, sentinel, hasMore } = useInfiniteSlice(ordered.length, 12, `${tab}:${sort}`);
 
   return (
     <>
@@ -69,12 +69,12 @@ export function ShopGrid() {
         </div>
       </div>
       <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 lg:grid-cols-4" aria-labelledby="shop-heading">
-        {visible.slice(0, shown).map((product) => (
+        {ordered.slice(0, shown).map((product) => (
           <ProductCard key={product.slug} product={product} />
         ))}
       </div>
       <p className="mt-8 text-center text-sm font-medium text-muted" aria-live="polite">
-        {t("shownOf").replace("{shown}", String(shown)).replace("{total}", String(visible.length))}
+        {t("shownOf").replace("{shown}", String(shown)).replace("{total}", String(ordered.length))}
       </p>
       {hasMore && <div ref={sentinel} className="h-8" aria-hidden />}
     </>

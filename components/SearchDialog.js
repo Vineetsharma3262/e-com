@@ -10,14 +10,18 @@ import { formatINR } from "@/lib/site";
 export function SearchDialog() {
   const { t, searchOpen, setSearchOpen } = useShop();
   const [query, setQuery] = useState("");
+  const [browse, setBrowse] = useState(() => products.slice(0, 6));
 
   useEffect(() => {
-    if (searchOpen) setQuery("");
+    if (searchOpen) {
+      setQuery("");
+      setBrowse(products.slice(0, 6));
+    }
   }, [searchOpen]);
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return products.slice(0, 6);
+    if (!q) return browse;
     return products.filter((product) => {
       const collection = collections.find((item) => item.slug === product.category);
       return (
@@ -25,7 +29,7 @@ export function SearchDialog() {
         collection?.title.toLowerCase().includes(q)
       );
     }).slice(0, 20);
-  }, [query]);
+  }, [browse, query]);
 
   if (!searchOpen) return null;
 

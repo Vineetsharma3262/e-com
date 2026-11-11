@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { BadgeCheck, ChevronRight, CreditCard, Plus, RotateCcw, ShoppingBag, Truck } from "lucide-react";
+import { BadgeCheck, ChevronLeft, ChevronRight, CreditCard, Plus, RotateCcw, ShoppingBag, Truck } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
 import { useShop } from "@/components/ShopProvider";
 import { saveCheckout } from "@/lib/checkout";
@@ -21,6 +21,12 @@ export function ProductView({ product, related }) {
   const router = useRouter();
   const gallery = [...new Set(product.images?.length ? product.images : [product.image])];
   const [photo, setPhoto] = useState(gallery[0]);
+  const photoIndex = Math.max(0, gallery.indexOf(photo));
+  function showPhoto(step) {
+    if (gallery.length < 2) return;
+    const next = (photoIndex + step + gallery.length) % gallery.length;
+    setPhoto(gallery[next]);
+  }
   const [size, setSize] = useState(product.sizes[0]);
   const detailsRef = useRef(null);
   useEffect(() => {
@@ -60,6 +66,26 @@ export function ProductView({ product, related }) {
           <div className="lg:sticky lg:top-36 lg:self-start">
             <div className="relative aspect-[4/5] overflow-hidden rounded-3xl bg-bg-alt">
               <img src={photo} alt={product.name} className="absolute inset-0 h-full w-full object-cover" />
+              {gallery.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    aria-label={t("prevPhoto")}
+                    onClick={() => showPhoto(-1)}
+                    className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-ink shadow-md transition hover:bg-white"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={t("nextPhoto")}
+                    onClick={() => showPhoto(1)}
+                    className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-ink shadow-md transition hover:bg-white"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                </>
+              )}
             </div>
             {gallery.length > 1 && (
               <div className="mt-3 flex gap-2">
