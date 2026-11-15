@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { useShop } from "@/components/ShopProvider";
+import { site } from "@/lib/site";
 
 const links = [
   { href: "/collections/men", key: "men" },
@@ -79,7 +80,7 @@ export function Header() {
       <div className="border-b border-line bg-bg/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 lg:px-8">
           <div className="flex items-center gap-6">
-            <Link href="/" aria-label="Aurelle home" className="flex items-center">
+            <Link href="/" aria-label={`${site.name} home`} className="flex items-center">
               <Logo />
             </Link>
             <Suspense fallback={<DesktopNavFallback t={t} />}>

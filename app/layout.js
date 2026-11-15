@@ -15,9 +15,10 @@ const fraunces = Fraunces({
 });
 
 export const metadata = {
+  metadataBase: new URL("https://wearveltho.com"),
   title: {
-    default: "Aurelle — Men's & Women's Clothing",
-    template: "%s — Aurelle",
+    default: "Wearveltho — Men's & Women's Clothing",
+    template: "%s — Wearveltho",
   },
   description:
     "T-shirts, shirts, two-piece and three-piece suits for men and women, from ₹200 to ₹9,500, delivered across India.",

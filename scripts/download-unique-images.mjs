@@ -4,7 +4,7 @@ import path from "node:path";
 const root = path.resolve(import.meta.dirname, "..");
 const outDir = path.join(root, "public", "images", "unique");
 const manifestPath = path.join(root, "lib", "unique-images.json");
-const UA = "AurelleCatalog/1.0 (clothing catalog; local demo store)";
+const UA = "WearvelthoCatalog/1.0 (clothing catalog; local demo store)";
 
 const groups = [
   {
