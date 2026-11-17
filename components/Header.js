@@ -60,8 +60,9 @@ function DesktopNavFallback({ t }) {
 }
 
 export function Header() {
-  const { t, lang, setLang, toggleTheme, count, setCartOpen, setSearchOpen, menuOpen, setMenuOpen } =
+  const { t, lang, setLang, toggleTheme, count, setCartOpen, setSearchOpen, menuOpen, setMenuOpen, user } =
     useShop();
+  const accountHref = user ? "/account" : "/login?next=/account";
   const [langOpen, setLangOpen] = useState(false);
 
   function closeMenu() {
@@ -148,8 +149,9 @@ export function Header() {
             >
               <Search className="h-5 w-5" />
             </button>
-            <Link href="/account" aria-label={t("profile")} className="rounded-full p-2 hover:bg-card">
+            <Link href={accountHref} aria-label={user ? user.name : t("loginAction")} className="inline-flex items-center gap-1.5 rounded-full p-2 hover:bg-card">
               <UserRound className="h-5 w-5" />
+              {user ? <span className="hidden max-w-24 truncate text-sm font-semibold md:inline">{user.name.split(" ")[0]}</span> : null}
             </Link>
             <button
               type="button"
@@ -204,8 +206,8 @@ export function Header() {
                 {t(link.key)}
               </Link>
             ))}
-            <Link href="/account" onClick={closeMenu} className="block border-b border-line px-4 py-3.5 text-[15px] font-semibold">
-              {t("profile")}
+            <Link href={accountHref} onClick={closeMenu} className="block border-b border-line px-4 py-3.5 text-[15px] font-semibold">
+              {user ? t("profile") : t("loginAction")}
             </Link>
             <div className="flex gap-2 px-4 py-3 xl:hidden">
               <button

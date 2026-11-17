@@ -8,7 +8,7 @@ import { saveCheckout } from "@/lib/checkout";
 import { formatINR } from "@/lib/site";
 
 export function ProductCard({ product }) {
-  const { t, addItem } = useShop();
+  const { t, addItem, checkoutHref } = useShop();
   const router = useRouter();
   const [size, setSize] = useState(product.sizes[0]);
   const [added, setAdded] = useState(false);
@@ -22,7 +22,7 @@ export function ProductCard({ product }) {
 
   function buy() {
     saveCheckout({ source: "buy", lines: [{ slug: product.slug, size, qty: 1 }] });
-    router.push("/checkout");
+    router.push(checkoutHref());
   }
 
   return (

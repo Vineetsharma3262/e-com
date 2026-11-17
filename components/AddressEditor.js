@@ -5,6 +5,8 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ChevronRight } from "lucide-react";
 import { useShop } from "@/components/ShopProvider";
+import { useRequireUser } from "@/components/useRequireUser";
+import { authMessage } from "@/lib/auth-errors";
 
 const fieldClass =
   "w-full rounded-xl border border-line bg-bg px-4 py-3 font-normal text-ink placeholder:text-muted/70 focus:border-ink focus:outline-none";
@@ -19,12 +21,15 @@ export function AddressEditor() {
   const search = useSearchParams();
   const router = useRouter();
   const { t, ready, addresses, saveAddress } = useShop();
+  const returnPath = params.id ? `/account/addresses/${params.id}` : "/account/addresses/new";
+  const signedIn = useRequireUser(search.toString() ? `${returnPath}?${search.toString()}` : returnPath);
   const existing = addresses.find((item) => item.id === params.id);
   const next = safeNext(search.get("next"));
   const [pinTouched, setPinTouched] = useState(false);
   const [lookup, setLookup] = useState("");
   const [localities, setLocalities] = useState([]);
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
   const [form, setForm] = useState(null);
 
   useEffect(() => {
@@ -74,7 +79,7 @@ export function AddressEditor() {
     setForm((current) => ({ ...current, [key]: value }));
   }
 
-  function onSubmit(event) {
+  async function onSubmit(event) {
     event.preventDefault();
     if (!/^\d{6}$/.test(form.pincode)) {
       setError(t("pincodeInvalid"));
@@ -88,19 +93,25 @@ export function AddressEditor() {
       setError(t("addressRequired"));
       return;
     }
-    saveAddress({
-      id: existing?.id,
-      fullName: form.fullName.trim(),
-      phone: form.phone,
-      pincode: form.pincode,
-      locality: form.locality.trim(),
-      address: form.address.trim(),
-      landmark: form.landmark.trim(),
-      city: form.city.trim(),
-      state: form.state.trim(),
-      isDefault: form.isDefault,
-    });
-    router.push(next);
+    setSaving(true);
+    try {
+      await saveAddress({
+        id: existing?.id,
+        fullName: form.fullName.trim(),
+        phone: form.phone,
+        pincode: form.pincode,
+        locality: form.locality.trim(),
+        address: form.address.trim(),
+        landmark: form.landmark.trim(),
+        city: form.city.trim(),
+        state: form.state.trim(),
+        isDefault: form.isDefault,
+      });
+      router.push(next);
+    } catch (reason) {
+      setError(authMessage(t, reason.message));
+      setSaving(false);
+    }
   }
 
   const title = existing ? t("editAddress") : t("addAddress");
@@ -124,7 +135,9 @@ export function AddressEditor() {
       </nav>
       <h1 className="mt-6 font-serif text-4xl font-semibold">{title}</h1>
       <p className="mt-2 text-muted">{t("pincodeHint")}</p>
-      {params.id && ready && !existing ? (
+      {!signedIn || !ready ? (
+        <p className="mt-8 text-muted">{t("lookingUp")}</p>
+      ) : params.id && !existing ? (
         <p className="mt-8 text-muted">{t("noAddresses")}</p>
       ) : !form ? (
         <p className="mt-8 text-muted">{t("lookingUp")}</p>
@@ -215,8 +228,8 @@ export function AddressEditor() {
             </label>
           </div>
           {error && <p className="mt-4 text-sm font-semibold text-accent">{error}</p>}
-          <button type="submit" className="mt-6 w-full rounded-full bg-accent py-3.5 font-semibold text-white transition hover:bg-accent-hover sm:w-auto sm:px-8">
-            {t("saveAddress")}
+          <button type="submit" disabled={saving} className="mt-6 w-full rounded-full bg-accent py-3.5 font-semibold text-white transition hover:bg-accent-hover disabled:opacity-50 sm:w-auto sm:px-8">
+            {saving ? t("pleaseWait") : t("saveAddress")}
           </button>
         </form>
       )}

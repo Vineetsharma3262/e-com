@@ -9,12 +9,12 @@ import { formatINR } from "@/lib/site";
 
 export function CartDrawer() {
   const router = useRouter();
-  const { t, cart, subtotal, shipping, total, cartOpen, setCartOpen, changeQty, removeItem } = useShop();
+  const { t, cart, subtotal, shipping, total, cartOpen, setCartOpen, changeQty, removeItem, checkoutHref } = useShop();
 
   function checkout() {
     saveCheckout({ source: "cart" });
     setCartOpen(false);
-    router.push("/checkout");
+    router.push(checkoutHref());
   }
 
   return (

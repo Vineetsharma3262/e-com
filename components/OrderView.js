@@ -4,14 +4,16 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { BadgeCheck, ChevronRight } from "lucide-react";
 import { useShop } from "@/components/ShopProvider";
+import { useRequireUser } from "@/components/useRequireUser";
 import { formatINR } from "@/lib/site";
 
 export function OrderView() {
   const params = useParams();
   const { t, ready, orders } = useShop();
+  const signedIn = useRequireUser(`/orders/${params.id || ""}`);
   const order = orders.find((item) => item.id === params.id);
 
-  if (!ready) return <p className="mx-auto max-w-3xl px-4 py-16 text-muted">{t("lookingUp")}</p>;
+  if (!ready || !signedIn) return <p className="mx-auto max-w-3xl px-4 py-16 text-muted">{t("lookingUp")}</p>;
 
   if (!order) {
     return (

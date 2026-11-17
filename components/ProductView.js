@@ -17,7 +17,7 @@ const trust = [
 ];
 
 export function ProductView({ product, related }) {
-  const { t, addItem, setCartOpen } = useShop();
+  const { t, addItem, setCartOpen, checkoutHref } = useShop();
   const router = useRouter();
   const gallery = [...new Set(product.images?.length ? product.images : [product.image])];
   const [photo, setPhoto] = useState(gallery[0]);
@@ -159,7 +159,7 @@ export function ProductView({ product, related }) {
                   type="button"
                   onClick={() => {
                     saveCheckout({ source: "buy", lines: [{ slug: product.slug, size, qty: 1 }] });
-                    router.push("/checkout");
+                    router.push(checkoutHref());
                   }}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 font-semibold text-white transition hover:bg-accent-hover"
                 >

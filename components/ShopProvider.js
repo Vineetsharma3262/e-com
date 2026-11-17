@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { faqs, faqsHi, getProduct } from "@/lib/catalog";
 import { translate } from "@/lib/i18n";
 import { site } from "@/lib/site";
@@ -27,7 +27,17 @@ export function ShopProvider({ children }) {
   const [toast, setToast] = useState("");
   const [addresses, setAddresses] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [user, setUser] = useState(null);
   const [ready, setReady] = useState(false);
+
+  const refreshAccount = useCallback(async () => {
+    const response = await fetch("/api/auth/me");
+    const data = await response.json().catch(() => ({ user: null, addresses: [], orders: [] }));
+    setUser(data.user || null);
+    setAddresses(Array.isArray(data.addresses) ? data.addresses : []);
+    setOrders(Array.isArray(data.orders) ? data.orders : []);
+    return data.user || null;
+  }, []);
 
   useEffect(() => {
     const storedLang = localStorage.getItem("lang");
@@ -39,35 +49,13 @@ export function ShopProvider({ children }) {
     } catch {
       setCart([]);
     }
-    try {
-      const storedAddresses = JSON.parse(localStorage.getItem("addresses") || "[]");
-      if (Array.isArray(storedAddresses)) setAddresses(storedAddresses);
-    } catch {
-      setAddresses([]);
-    }
-    try {
-      const storedOrders = JSON.parse(localStorage.getItem("orders") || "[]");
-      if (Array.isArray(storedOrders)) setOrders(storedOrders);
-    } catch {
-      setOrders([]);
-    }
-    setReady(true);
-  }, []);
+    refreshAccount().finally(() => setReady(true));
+  }, [refreshAccount]);
 
   useEffect(() => {
     if (!ready) return;
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart, ready]);
-
-  useEffect(() => {
-    if (!ready) return;
-    localStorage.setItem("addresses", JSON.stringify(addresses));
-  }, [addresses, ready]);
-
-  useEffect(() => {
-    if (!ready) return;
-    localStorage.setItem("orders", JSON.stringify(orders));
-  }, [orders, ready]);
 
   useEffect(() => {
     document.documentElement.lang = lang === "hi" ? "hi" : "en";
@@ -141,55 +129,71 @@ export function ShopProvider({ children }) {
     setCart([]);
   }
 
-  function saveAddress(input) {
-    setAddresses((current) => {
-      const id = input.id || crypto.randomUUID();
-      const record = { ...input, id };
-      const next = input.id
-        ? current.map((item) => (item.id === id ? record : item))
-        : [...current, record];
-      const makeDefault = input.isDefault || !next.some((item) => item.isDefault && item.id !== id);
-      if (makeDefault) return next.map((item) => ({ ...item, isDefault: item.id === id }));
-      return next.map((item) => (item.id === id ? { ...item, isDefault: false } : item));
+  async function saveAddress(input) {
+    const hasId = Boolean(input.id);
+    const response = await fetch(hasId ? `/api/addresses/${input.id}` : "/api/addresses", {
+      method: hasId ? "PATCH" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
     });
+    const data = await response.json().catch(() => ({ ok: false, error: "ADDRESS_INVALID" }));
+    if (!data.ok) throw new Error(data.error || "ADDRESS_INVALID");
+    setAddresses(data.addresses);
   }
 
-  function removeAddress(id) {
-    setAddresses((current) => {
-      const next = current.filter((item) => item.id !== id);
-      if (next.length && !next.some((item) => item.isDefault)) {
-        next[0] = { ...next[0], isDefault: true };
-      }
-      return next;
+  async function removeAddress(id) {
+    const response = await fetch(`/api/addresses/${id}`, { method: "DELETE" });
+    const data = await response.json().catch(() => ({ ok: false }));
+    if (!data.ok) {
+      notify(translate(lang, "addressFailed"));
+      return;
+    }
+    setAddresses(data.addresses);
+  }
+
+  async function setDefaultAddress(id) {
+    const response = await fetch(`/api/addresses/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isDefault: true }),
     });
+    const data = await response.json().catch(() => ({ ok: false }));
+    if (!data.ok) {
+      notify(translate(lang, "addressFailed"));
+      return;
+    }
+    setAddresses(data.addresses);
   }
 
-  function setDefaultAddress(id) {
-    setAddresses((current) => current.map((item) => ({ ...item, isDefault: item.id === id })));
+  async function placeOrder({ lines, address, payment }) {
+    const response = await fetch("/api/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        payment,
+        addressId: address.id,
+        lines: lines.map((line) => ({
+          slug: line.product?.slug || line.slug,
+          size: line.size,
+          qty: line.qty,
+        })),
+      }),
+    });
+    const data = await response.json().catch(() => ({ ok: false, error: "ORDER_FAILED" }));
+    if (!data.ok) throw new Error(data.error || "ORDER_FAILED");
+    setOrders((current) => [data.order, ...current]);
+    return data.order;
   }
 
-  function placeOrder({ lines, address, payment }) {
-    const orderSubtotal = lines.reduce((sum, line) => sum + line.product.price * line.qty, 0);
-    const orderShipping = orderSubtotal === 0 || orderSubtotal >= site.freeShippingOver ? 0 : site.shippingFee;
-    const order = {
-      id: `AUR${Date.now().toString().slice(-8)}`,
-      items: lines.map((line) => ({
-        slug: line.product.slug,
-        name: line.product.name,
-        image: line.product.image,
-        size: line.size,
-        qty: line.qty,
-        price: line.product.price,
-      })),
-      address: { ...address },
-      payment,
-      subtotal: orderSubtotal,
-      shipping: orderShipping,
-      total: orderSubtotal + orderShipping,
-      createdAt: new Date().toISOString(),
-    };
-    setOrders((current) => [order, ...current]);
-    return order;
+  async function logout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    setUser(null);
+    setAddresses([]);
+    setOrders([]);
+  }
+
+  function checkoutHref() {
+    return user ? "/checkout" : "/login?next=/checkout";
   }
 
   const lines = cart
@@ -228,6 +232,10 @@ export function ShopProvider({ children }) {
     removeItem,
     clearCart,
     ready,
+    user,
+    refreshAccount,
+    logout,
+    checkoutHref,
     addresses,
     orders,
     saveAddress,

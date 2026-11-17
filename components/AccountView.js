@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ChevronRight, MapPin, Plus } from "lucide-react";
 import { useShop } from "@/components/ShopProvider";
+import { useRequireUser } from "@/components/useRequireUser";
 import { formatINR } from "@/lib/site";
 
 function formatWhen(value, lang) {
@@ -14,9 +16,16 @@ function formatWhen(value, lang) {
 }
 
 export function AccountView() {
-  const { t, lang, ready, addresses, orders, removeAddress, setDefaultAddress } = useShop();
+  const router = useRouter();
+  const { t, lang, ready, user, addresses, orders, removeAddress, setDefaultAddress, logout } = useShop();
+  const signedIn = useRequireUser("/account");
 
-  if (!ready) {
+  async function signOut() {
+    await logout();
+    router.push("/");
+  }
+
+  if (!ready || !signedIn) {
     return <p className="mx-auto max-w-5xl px-4 py-16 text-muted">{t("lookingUp")}</p>;
   }
 
@@ -33,8 +42,16 @@ export function AccountView() {
           </li>
         </ol>
       </nav>
-      <h1 className="mt-6 font-serif text-4xl font-semibold sm:text-5xl">{t("yourAccount")}</h1>
-      <p className="mt-2 max-w-xl text-muted">{t("accountNote")}</p>
+      <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="font-serif text-4xl font-semibold sm:text-5xl">{t("helloUser").replace("{name}", user.name.split(" ")[0])}</h1>
+          <p className="mt-2 text-muted">{user.email}</p>
+          <p className="mt-2 max-w-xl text-muted">{t("accountNote")}</p>
+        </div>
+        <button type="button" onClick={signOut} className="rounded-full border border-line px-4 py-2 text-sm font-semibold hover:border-ink">
+          {t("logout")}
+        </button>
+      </div>
 
       <section className="mt-10">
         <div className="flex flex-wrap items-end justify-between gap-3">

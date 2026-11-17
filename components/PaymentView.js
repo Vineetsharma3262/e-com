@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { BadgeCheck, Lock } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { useShop } from "@/components/ShopProvider";
+import { useRequireUser } from "@/components/useRequireUser";
 import { clearCheckout, clearPendingPayment, readPendingPayment } from "@/lib/checkout";
 import { getProduct } from "@/lib/catalog";
 import { formatINR, site } from "@/lib/site";
@@ -18,6 +19,7 @@ const banks = ["State Bank of India", "HDFC Bank", "ICICI Bank", "Axis Bank", "K
 export function PaymentView() {
   const router = useRouter();
   const { t, placeOrder, clearCart } = useShop();
+  const signedIn = useRequireUser("/checkout/pay");
   const [pending, setPending] = useState(undefined);
   const [method, setMethod] = useState("card");
   const [cardNumber, setCardNumber] = useState("");
@@ -67,21 +69,26 @@ export function PaymentView() {
     }
     setError("");
     setPhase("processing");
-    window.setTimeout(() => {
-      const order = placeOrder({
-        lines: summary.lines,
-        address: pending.address,
-        payment: "online",
-      });
-      if (pending.source === "cart") clearCart();
-      clearCheckout();
-      clearPendingPayment();
-      setPhase("success");
-      window.setTimeout(() => router.push(`/orders/${order.id}`), 700);
+    window.setTimeout(async () => {
+      try {
+        const order = await placeOrder({
+          lines: summary.lines,
+          address: pending.address,
+          payment: "online",
+        });
+        if (pending.source === "cart") clearCart();
+        clearCheckout();
+        clearPendingPayment();
+        setPhase("success");
+        window.setTimeout(() => router.push(`/orders/${order.id}`), 700);
+      } catch {
+        setPhase("form");
+        setError(t("orderFailed"));
+      }
     }, 1100);
   }
 
-  if (pending === undefined) {
+  if (!signedIn || pending === undefined) {
     return <p className="mx-auto max-w-5xl px-4 py-16 text-muted">{t("lookingUp")}</p>;
   }
 

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ChevronRight, MapPin } from "lucide-react";
 import { useShop } from "@/components/ShopProvider";
+import { useRequireUser } from "@/components/useRequireUser";
 import { clearCheckout, readCheckout, savePendingPayment } from "@/lib/checkout";
 import { getProduct } from "@/lib/catalog";
 import { formatINR, site } from "@/lib/site";
@@ -22,10 +23,13 @@ function resolveBuyLines(draft) {
 export function CheckoutView() {
   const router = useRouter();
   const { t, ready, cart, addresses, placeOrder, clearCart } = useShop();
+  const signedIn = useRequireUser("/checkout");
   const [draft, setDraft] = useState(null);
   const [loaded, setLoaded] = useState(false);
   const [addressId, setAddressId] = useState("");
   const [payment, setPayment] = useState("cod");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     setDraft(readCheckout());
@@ -41,11 +45,11 @@ export function CheckoutView() {
   const hasItems = draft?.source === "cart" ? cart.length > 0 : (draft?.lines?.length || 0) > 0;
 
   useEffect(() => {
-    if (!ready || !loaded) return;
+    if (!signedIn || !loaded) return;
     if (addresses.length === 0 && hasItems) {
       router.replace("/account/addresses/new?next=/checkout");
     }
-  }, [ready, loaded, addresses.length, hasItems, router]);
+  }, [signedIn, loaded, addresses.length, hasItems, router]);
 
   const lines = draft?.source === "cart" ? cart : resolveBuyLines(draft);
   const subtotal = lines.reduce((sum, line) => sum + line.product.price * line.qty, 0);
@@ -53,8 +57,9 @@ export function CheckoutView() {
   const total = subtotal + shipping;
   const address = addresses.find((item) => item.id === addressId) || null;
 
-  function place() {
-    if (!address || lines.length === 0) return;
+  async function place() {
+    if (!address || lines.length === 0 || busy) return;
+    setError("");
     if (payment === "online") {
       savePendingPayment({
         source: draft?.source || "buy",
@@ -64,13 +69,19 @@ export function CheckoutView() {
       router.push("/checkout/pay");
       return;
     }
-    const order = placeOrder({ lines, address, payment: "cod" });
-    if (draft?.source === "cart") clearCart();
-    clearCheckout();
-    router.push(`/orders/${order.id}`);
+    setBusy(true);
+    try {
+      const order = await placeOrder({ lines, address, payment: "cod" });
+      if (draft?.source === "cart") clearCart();
+      clearCheckout();
+      router.push(`/orders/${order.id}`);
+    } catch {
+      setError(t("orderFailed"));
+      setBusy(false);
+    }
   }
 
-  if (!loaded || !ready || (addresses.length === 0 && lines.length > 0)) {
+  if (!signedIn || !loaded || !ready || (addresses.length === 0 && lines.length > 0)) {
     return <p className="mx-auto max-w-5xl px-4 py-16 text-muted">{t("lookingUp")}</p>;
   }
 
@@ -202,13 +213,14 @@ export function CheckoutView() {
                 <dd>{formatINR(total)}</dd>
               </div>
             </dl>
+            {error ? <p className="mt-4 text-sm font-semibold text-accent" role="alert">{error}</p> : null}
             <button
               type="button"
-              disabled={!address}
+              disabled={!address || busy}
               onClick={place}
               className="mt-5 w-full rounded-full bg-accent py-3.5 font-semibold text-white transition hover:bg-accent-hover disabled:opacity-40"
             >
-              {payment === "cod" ? t("placeCod") : t("continuePay")}
+              {busy ? t("pleaseWait") : payment === "cod" ? t("placeCod") : t("continuePay")}
             </button>
           </aside>
         </div>
