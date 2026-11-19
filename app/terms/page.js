@@ -40,6 +40,9 @@ export default function TermsPage() {
         <div className={`mt-6 text-[17px] ${prose}`}>
           <p>Welcome to {site.name}.</p>
           <p>
+            {site.name} is operated by <b>{site.company}</b>. In these terms, “the Company”, “we”, “us” and “our” mean {site.company}.
+          </p>
+          <p>
             These terms and conditions outline the rules and regulations for the use of the {site.name} website.
           </p>
           <p>
@@ -172,6 +175,8 @@ export default function TermsPage() {
           <address className="rounded-2xl border border-line bg-card p-5 not-italic">
             <b>Grievance Officer</b>, Customer Care, {site.name}
             <br />
+            {site.company}
+            <br />
             Email: <a href={`mailto:${site.email}`}>{site.email}</a>
             <br />
             Phone/WhatsApp: <a href={`tel:${site.phoneTel}`}>{site.phoneDisplay}</a>
@@ -203,6 +208,8 @@ export default function TermsPage() {
           <p>Any dispute arising under these terms and conditions shall be subject to the jurisdiction of the courts in India only.</p>
           <address className="rounded-2xl border border-line bg-card p-5 not-italic">
             <b>{site.name}</b>
+            <br />
+            {site.company}
             <br />
             {site.addressOneLine}
             <br />

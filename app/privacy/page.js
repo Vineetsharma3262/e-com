@@ -39,7 +39,7 @@ export default function PrivacyPage() {
       <p className="mt-3 text-sm text-muted">Last updated: 3 November 2026</p>
       <div className={`mt-6 text-[17px] ${prose}`}>
       <p>
-        This policy explains what personal data {site.name} (“we”, “us”) collects when you use this website, why we collect it, who we share it with and the choices you have. It is written in line with the Digital Personal Data Protection Act, 2023 and the Information Technology Act, 2000.         By using this website or placing an order, you agree to this policy.
+        This policy explains what personal data {site.name}, operated by {site.company} (“we”, “us”), collects when you use this website, why we collect it, who we share it with and the choices you have. It is written in line with the Digital Personal Data Protection Act, 2023 and the Information Technology Act, 2000. By using this website or placing an order, you agree to this policy.
       </p>
       </div>
       <nav aria-label="Contents" className="mt-8 rounded-2xl border border-line bg-card p-5">
@@ -114,6 +114,8 @@ export default function PrivacyPage() {
         <p>For any privacy question, request or complaint, contact our grievance officer. We acknowledge complaints within 48 hours and aim to resolve them within one month.</p>
         <address className="rounded-2xl border border-line bg-card p-5 not-italic">
           <b>Grievance Officer</b>, Customer Care, {site.name}
+          <br />
+          {site.company}
           <br />
           {site.addressOneLine}
           <br />

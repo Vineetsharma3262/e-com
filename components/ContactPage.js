@@ -74,6 +74,7 @@ export function ContactPage() {
           <p className="text-sm font-bold uppercase tracking-[0.2em] text-accent">{t("contactKicker")}</p>
           <h1 className="mt-3 font-serif text-5xl font-semibold leading-tight sm:text-6xl">{t("contactTitle")}</h1>
           <p className="mt-4 text-[17px] text-muted">{t("contactBody")}</p>
+          <p className="mt-3 text-sm font-semibold text-ink">{site.company}</p>
         </div>
 
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

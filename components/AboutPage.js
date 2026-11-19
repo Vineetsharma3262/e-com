@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import { useShop } from "@/components/ShopProvider";
+import { site } from "@/lib/site";
 
 const points = [
   ["/images/rack.jpg", "A rail of neutral-toned clothes", "why1k", "why1t", "why1b"],
@@ -52,6 +53,7 @@ export function AboutPage() {
             <div className="mt-6 space-y-4 text-[17px] leading-relaxed text-muted">
               <p>{t("aboutP1")}</p>
               <p>{t("aboutP2")}</p>
+              <p className="font-semibold text-ink">{t("operatedBy")} {site.company}.</p>
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/collections/all" className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 font-semibold text-white transition hover:bg-accent-hover">

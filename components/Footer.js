@@ -34,6 +34,7 @@ export function Footer() {
         <div>
           <Logo tone="light" />
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-[#e9e1d6]/75">{t("footerBlurb")}</p>
+          <p className="mt-3 max-w-xs text-xs font-semibold uppercase tracking-[0.08em] text-[#e9e1d6]/80">{site.company}</p>
           <div className="mt-5 flex gap-3">
             <a href={site.instagram} aria-label="Instagram" className="grid h-11 w-11 place-items-center rounded-full border border-white/20 hover:border-[#e2672c] hover:text-[#e2672c]">
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
@@ -122,7 +123,7 @@ export function Footer() {
       </div>
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-[#e9e1d6]/60 sm:flex-row lg:px-8">
-          <p>{t("rights")}</p>
+          <p>© 2026, {site.name} · {site.company}</p>
           <p>{t("payments")}</p>
         </div>
       </div>
